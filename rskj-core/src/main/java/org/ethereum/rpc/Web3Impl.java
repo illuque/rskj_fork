@@ -683,7 +683,15 @@ public class Web3Impl implements Web3 {
         long blockNumber;
 
         try {
-            blockNumber = HexUtils.stringNumberAsBigInt(number).longValue();
+            if ("safe".equalsIgnoreCase(number)) {
+                long safeBlockNumber = blockchain.getBestBlock().getNumber() - 10;
+                blockNumber = this.blockchain.getBlockByNumber(safeBlockNumber).getNumber();
+            } else if ("finalized".equalsIgnoreCase(number)) {
+                long finalizedBlockNumber = blockchain.getBestBlock().getNumber() - 20;
+                blockNumber = this.blockchain.getBlockByNumber(finalizedBlockNumber).getNumber();
+            } else {
+                blockNumber = HexUtils.stringHexToBigInteger(number).longValue();
+            }
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             throw invalidParamError(String.format("invalid blocknumber %s", number));
         }

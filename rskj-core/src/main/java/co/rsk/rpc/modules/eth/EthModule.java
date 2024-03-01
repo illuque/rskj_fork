@@ -266,7 +266,17 @@ public class EthModule
                 return repositoryLocator.snapshotAt(blockchain.getBestBlock().getHeader());
             default:
                 try {
-                    long blockNumber = HexUtils.stringHexToBigInteger(id).longValue();
+                    long blockNumber;
+                    if ("safe".equalsIgnoreCase(id)) {
+                        long safeBlockNumber = blockchain.getBestBlock().getNumber() - 10;
+                        blockNumber = this.blockchain.getBlockByNumber(safeBlockNumber).getNumber();
+                    } else if ("finalized".equalsIgnoreCase(id)) {
+                        long finalizedBlockNumber = blockchain.getBestBlock().getNumber() - 20;
+                        blockNumber = this.blockchain.getBlockByNumber(finalizedBlockNumber).getNumber();
+                    } else {
+                        blockNumber = HexUtils.stringHexToBigInteger(id).longValue();
+                    }
+
                     Block requestedBlock = blockchain.getBlockByNumber(blockNumber);
                     if (requestedBlock != null) {
                         return repositoryLocator.snapshotAt(requestedBlock.getHeader());

@@ -128,6 +128,14 @@ public class Web3InformationRetriever {
     private long getBlockNumber(String identifier) {
         long blockNumber;
         try {
+            if (identifier.equals("safe")) {
+                long safeBlock = blockchain.getBestBlock().getNumber() - 10;
+                identifier = HexUtils.toQuantityJsonHex(blockchain.getBlockByNumber(safeBlock).getNumber());
+            } else if (identifier.equals("finalized")) {
+                long finalizedBlock = blockchain.getBestBlock().getNumber() - 20;
+                identifier = HexUtils.toQuantityJsonHex(blockchain.getBlockByNumber(finalizedBlock).getNumber());
+            }
+
             blockNumber = HexUtils.stringHexToBigInteger(identifier).longValue();
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             throw invalidParamError(String.format("invalid blocknumber %s", identifier));

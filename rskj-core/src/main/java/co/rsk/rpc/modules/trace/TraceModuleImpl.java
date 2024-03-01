@@ -205,7 +205,18 @@ public class TraceModuleImpl implements TraceModule {
             return executionBlockRetriever.retrieveExecutionBlock(PENDING_BLOCK).getBlock();
         } else {
             try {
-                long blockNumber = HexUtils.stringHexToBigInteger(id).longValue();
+                long blockNumber;
+
+                if ("safe".equalsIgnoreCase(id)) {
+                    long safeBlockNumber = blockchain.getBestBlock().getNumber() - 10;
+                    blockNumber = this.blockchain.getBlockByNumber(safeBlockNumber).getNumber();
+                } else if ("finalized".equalsIgnoreCase(id)) {
+                    long finalizedBlockNumber = blockchain.getBestBlock().getNumber() - 20;
+                    blockNumber = this.blockchain.getBlockByNumber(finalizedBlockNumber).getNumber();
+                } else {
+                    blockNumber = HexUtils.stringHexToBigInteger(id).longValue();
+                }
+
                 return this.blockchain.getBlockByNumber(blockNumber);
             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                 throw RskJsonRpcRequestException.invalidParamError("invalid blocknumber " + id);
